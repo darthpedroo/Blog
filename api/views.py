@@ -4,30 +4,31 @@ from rest_framework.views import APIView
 from base.models import *
 from .serializer import *
 
+class BaseView(APIView):
+    model = None
+    model_serializer = None
 
-class GetAll:
-    def __init__(self, model, modelSerializer):
-        self.model = model.objects.all()
-        self.modelSerializer = modelSerializer(self.model, many=True)
-    
-    def return_view(self):
-        return Response(self.modelSerializer.data)
+class GetAllAPIView(BaseView):
+    def get(self, request):
+        queryset = self.model.objects.all()
+        serializer = self.model_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-@api_view(["GET"])
-def get_all_articles(request):
-    articles = GetAll(Article,ArticleSerializer)
-    return articles.return_view()
+class GetDataFilteredByPk(BaseView):
+    def get(self,request,*args, **kwargs):
+        queryset = self.model.objects.filter(articleId_id=self.kwargs['pk'])
+        serializer = self.model_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-@api_view(["GET"])
-def get_all_paragraphs(request):
-    paragraphs = GetAll(Paragraph, ParagraphsSerializer)
-    return paragraphs.return_view()
+class GetAllArticlesView(GetAllAPIView):
+    model = Article
+    model_serializer = ArticleSerializer
 
+class GetAllParagraphsView(GetAllAPIView):
+    model = Paragraph
+    model_serializer = ParagraphsSerializer
 
-@api_view(["GET"])
-def get_all_paragraphs_from_article(request,article_pk):
-    
-    paragraphs = Paragraph.objects.filter(articleId_id=article_pk)
-    serializer = ParagraphsSerializer(paragraphs, many=True)
-    
-    return Response(serializer.data)
+class GetParagraphsFromArticle(GetDataFilteredByPk):
+    model = Paragraph
+    model_serializer = ParagraphsSerializer
+
