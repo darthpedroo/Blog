@@ -6,7 +6,7 @@ class Article(models.Model):
 class Paragraph(models.Model):
     articleId = models.ForeignKey(Article, on_delete=models.CASCADE)
     text = models.TextField()
-
+    index_order = models.BigIntegerField()
 
 
     
