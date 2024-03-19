@@ -73,6 +73,8 @@ class DeleteData(ModelBuilder, DeleteDataStrategy):
         queryset.delete()
         return Response("Matateeee")    
 
+#View Handler
+
 class ViewHandler(APIView):
     model = None
     model_serializer = None
@@ -178,3 +180,18 @@ class SingleParagraphView(ParagraphView):
 
     def delete(self,request, *args, **kwargs):
         return self.perform_delete_data_strategy(request,*args,**kwargs)
+
+class ImageView(ViewHandler):
+    model = Image
+    model_serializer = ImageSerializer
+
+class AllImagesView(ImageView):
+    strategy_get_method = GetAllData
+    strategy_post_method = PostData
+
+    def get(self, request, *args, **kwargs):
+        return self.perform_get_data_strategy(request, *args, **kwargs)
+    
+    def post(self,request):
+        return self.perform_post_data_strategy(request)
+
